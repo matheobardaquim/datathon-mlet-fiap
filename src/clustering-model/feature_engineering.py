@@ -74,7 +74,8 @@ def save_json_records(df: pd.DataFrame, out: Path):
 
 
 def select_text_column(df: pd.DataFrame) -> str:
-    candidates = [c for c in df.columns if any(k in c.lower() for k in ("descricao", "descricao_vaga", "perfil", "texto", "title", "titulo", "summary", "job"))]
+    # column names may not be strings (e.g. integers). cast to str before lower().
+    candidates = [c for c in df.columns if any(k in str(c).lower() for k in ("descricao", "descricao_vaga", "perfil", "texto", "title", "titulo", "summary", "job"))]
     if candidates:
         return candidates[0]
     obj_cols = [c for c in df.columns if df[c].dtype == "object"]
