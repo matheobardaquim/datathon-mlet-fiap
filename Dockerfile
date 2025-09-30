@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar os artefatos e o código-fonte para o contêiner
 # A CORREÇÃO FINAL ESTÁ AQUI:
 # Copia o modelo de ML de dentro da pasta 'Data' para a raiz do WORKDIR (/app)
-COPY Data/pipeline_model_v2.joblib .
+COPY Data/pipeline_model_v2.joblib.gz .
 
 # Copia toda a pasta 'src' para dentro do WORKDIR, mantendo sua estrutura
 COPY src/ ./src

@@ -16,7 +16,7 @@ app = FastAPI(
 # --- Carregando o pipeline completo (modelo V2) ---
 try:
     PROJECT_ROOT = pathlib.Path(__file__).parent.resolve().parent.parent
-    PIPELINE_PATH = PROJECT_ROOT / "pipeline_model_v2.joblib" # <-- Correto
+    PIPELINE_PATH = PROJECT_ROOT / "pipeline_model_v2.joblib.gz" # <-- Correto
     
     pipeline = joblib.load(PIPELINE_PATH)
     print("Pipeline do Modelo V2 carregada com sucesso.")
