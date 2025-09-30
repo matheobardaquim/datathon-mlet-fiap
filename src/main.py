@@ -1,0 +1,15 @@
+from fastapi import FastAPI
+from src.routers import prediction, prometheus
+from src.helpers.middleware import PrometheusMiddleware
+
+app = FastAPI(
+    title="API de Match de Vagas V2",
+    description="Uma API com um modelo otimizado para prever a compatibilidade.",
+    version="2.0"
+)
+
+# Adiciona o middleware para instrumentar as rotas
+app.add_middleware(PrometheusMiddleware)
+
+app.include_router(prediction.router)
+app.include_router(prometheus.router)

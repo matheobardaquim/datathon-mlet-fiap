@@ -1,0 +1,15 @@
+# --- API ---
+fastapi
+uvicorn[standard]
+python-multipart
+
+# --- Machine Learning ---
+scikit-learn
+joblib
+
+# --- Manipulação de Dados ---
+pandas
+pyarrow
+numpy
+
+prometheus_client

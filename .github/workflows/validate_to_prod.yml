@@ -1,0 +1,33 @@
+name: Testes Unitários
+
+# Aciona o workflow em push e pull requests para o branch principal
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run_tests:
+    name: Rodar Testes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Use a versão do seu projeto
+
+      - name: Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements_test.txt
+          
+      - name: Rodar Testes Unitários
+        run: pytest tests/ # ou o comando que você usa para rodar seus testes

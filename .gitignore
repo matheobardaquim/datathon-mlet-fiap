@@ -205,3 +205,22 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Itens da pasta Data/
+Data/raw/applicants.json
+Data/raw/prospects.json
+Data/raw/vagas.json
+Data/processed/dados_unificados.parquet
+Data/passo_2_e_3_avancado.py
+Data/passo1_data_load.py
+Data/passo1b_data_load.py
+Data/passo2_preprocessing.py
+Data/passo3_treinamento.py
+Data/schema.txt
+Data/X_test_processed.npy
+Data/X_train_processed.npy
+Data/y_test.csv
+Data/y_train.csv
+Data/passo_4_modelo_nlp.py
+Data/pipeline_model_v2.joblib
