@@ -1,7 +1,7 @@
 # app/main.py
 
 from fastapi import FastAPI
-from src.routers import prediction
+from src.routers import prediction, prometheus
 
 app = FastAPI(
     title="API de Match de Vagas V2",
@@ -11,3 +11,4 @@ app = FastAPI(
 
 # Inclui as rotas definidas no arquivo prediction.py
 app.include_router(prediction.router)
+app.include_router(prometheus.router)
