@@ -222,3 +222,5 @@ Data/X_test_processed.npy
 Data/X_train_processed.npy
 Data/y_test.csv
 Data/y_train.csv
+Data/passo_4_modelo_nlp.py
+Data/pipeline_model_v2.joblib

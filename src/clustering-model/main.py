@@ -1,4 +1,4 @@
-# main.py
+# main.py (versão com a função predict CORRIGIDA)
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -8,100 +8,91 @@ import pathlib
 
 # Inicializa o aplicativo FastAPI
 app = FastAPI(
-    title="API de Match de Vagas",
-    description="Uma API para prever a compatibilidade entre candidatos e vagas.",
-    version="1.0"
+    title="API de Match de Vagas V2",
+    description="Uma API com um modelo otimizado para prever a compatibilidade.",
+    version="2.0"
 )
 
-# --- Carregando os modelos ---
-# Estes arquivos foram criados no Passo 2 e 3
+# --- Carregando o pipeline completo (modelo V2) ---
 try:
-    # Volta duas pastas para chegar na raiz do projeto
-    PROJECT_ROOT = pathlib.Path(__file__).parent.resolve().parent.parent 
+    PROJECT_ROOT = pathlib.Path(__file__).parent.resolve().parent.parent
+    PIPELINE_PATH = PROJECT_ROOT / "pipeline_model_v2.joblib" # <-- Correto
     
-    # Constrói o caminho correto para a pasta /data/
-    PREPROCESSOR_PATH = PROJECT_ROOT / "data" / "preprocessor.joblib"
-    MODEL_PATH = PROJECT_ROOT / "data" / "random_forest_model.joblib"
-    
-    preprocessor = joblib.load(PREPROCESSOR_PATH)
-    model = joblib.load(MODEL_PATH)
-    print("Modelos carregados com sucesso a partir de:", PROJECT_ROOT / "data")
+    pipeline = joblib.load(PIPELINE_PATH)
+    print("Pipeline do Modelo V2 carregada com sucesso.")
 
 except FileNotFoundError:
-    print(f"ERRO: Arquivos de modelo não encontrados nos caminhos esperados:")
-    print(f"Tentativa de caminho para o Preprocessor: {PREPROCESSOR_PATH}")
-    print(f"Tentativa de caminho para o Model: {MODEL_PATH}")
-    preprocessor = None
-    model = None
+    print(f"ERRO: Pipeline não encontrada no caminho: {PIPELINE_PATH}")
+    pipeline = None
 
-# --- Definindo o formato de entrada dos dados ---
-# Usamos Pydantic para validar os dados que chegam na API.
-# As informações devem ser exatamente as mesmas que usamos para treinar o modelo.
+
+# --- Definindo o formato de entrada dos dados (mais colunas) ---
 class CandidateData(BaseModel):
-    # Features do candidato
     nivel_profissional_candidato: str
     nivel_academico_candidato: str
     nivel_ingles_candidato: str
-    # Features da vaga
     nivel_profissional_vaga: str
     nivel_academico_vaga: str
     nivel_ingles_vaga: str
-
+    area_atuacao_candidato: str
+    area_atuacao_vaga: str
+    tipo_contratacao_vaga: str
+    
     class Config:
-        json_schema_extra  = {
+        json_schema_extra = {
             "example": {
                 "nivel_profissional_candidato": "sênior",
                 "nivel_academico_candidato": "ensino superior completo",
                 "nivel_ingles_candidato": "avançado",
                 "nivel_profissional_vaga": "sênior",
                 "nivel_academico_vaga": "ensino superior completo",
-                "nivel_ingles_vaga": "fluente"
+                "nivel_ingles_vaga": "fluente",
+                "area_atuacao_candidato": "ti - sistemas e ferramentas-",
+                "area_atuacao_vaga": "ti - sistemas e ferramentas-",
+                "tipo_contratacao_vaga": "clt full"
             }
         }
 
-# --- Criando o endpoint de predição ---
+# --- Criando o endpoint de predição (VERSÃO CORRIGIDA) ---
 @app.post("/predict")
 def predict(data: CandidateData):
-    """
-    Recebe os dados de um candidato e de uma vaga e retorna a predição de match.
-    - **0**: Não-Match
-    - **1**: Match
-    """
-    if not preprocessor or not model:
-        return {"error": "Modelos não foram carregados. Verifique os logs do servidor."}
+    if not pipeline:
+        return {"error": "Pipeline do modelo não foi carregada. Verifique os logs."}
 
-    # 1. Converter os dados de entrada para um DataFrame do Pandas
-    # A ordem das colunas DEVE ser a mesma do treinamento.
+    # 1. Converter os dados de entrada para um DataFrame
+    # A ordem das colunas é importante para a etapa de criação das features de match
     input_data = {
-        'informacoes_profissionais.nivel_profissional': [data.nivel_profissional_candidato.lower()],
-        'formacao_e_idiomas.nivel_academico': [data.nivel_academico_candidato.lower()],
-        'formacao_e_idiomas.nivel_ingles': [data.nivel_ingles_candidato.lower()],
-        'perfil_vaga.nivel profissional': [data.nivel_profissional_vaga.lower()],
-        'perfil_vaga.nivel_academico': [data.nivel_academico_vaga.lower()],
-        'perfil_vaga.nivel_ingles': [data.nivel_ingles_vaga.lower()]
+        'informacoes_profissionais.nivel_profissional': [data.nivel_profissional_candidato],
+        'formacao_e_idiomas.nivel_academico': [data.nivel_academico_candidato],
+        'formacao_e_idiomas.nivel_ingles': [data.nivel_ingles_candidato],
+        'perfil_vaga.nivel profissional': [data.nivel_profissional_vaga],
+        'perfil_vaga.nivel_academico': [data.nivel_academico_vaga], # << Erro de digitação corrigido aqui
+        'perfil_vaga.nivel_ingles': [data.nivel_ingles_vaga],
+        'informacoes_profissionais.area_atuacao': [data.area_atuacao_candidato],
+        'perfil_vaga.areas_atuacao': [data.area_atuacao_vaga],
+        'informacoes_basicas.tipo_contratacao': [data.tipo_contratacao_vaga]
     }
     df = pd.DataFrame(input_data)
+
+    # 2. <<< ETAPA FALTANTE ADICIONADA AQUI >>>
+    # Criar as features de 'match_*' exatamente como fizemos no treinamento
+    df['match_nivel_profissional'] = (df['informacoes_profissionais.nivel_profissional'].str.lower() == df['perfil_vaga.nivel profissional'].str.lower()).astype(int)
+    df['match_nivel_academico'] = (df['formacao_e_idiomas.nivel_academico'].str.lower() == df['perfil_vaga.nivel_academico'].str.lower()).astype(int)
+    df['match_nivel_ingles'] = (df['formacao_e_idiomas.nivel_ingles'].str.lower() == df['perfil_vaga.nivel_ingles'].str.lower()).astype(int)
+    df['match_area_atuacao'] = (df['informacoes_profissionais.area_atuacao'].str.lower() == df['perfil_vaga.areas_atuacao'].str.lower()).astype(int)
     
-    # 2. Criar as features de 'match_*' da mesma forma que no treino
-    df['match_nivel_profissional'] = (df[df.columns[0]] == df[df.columns[3]]).astype(int)
-    df['match_nivel_academico'] = (df[df.columns[1]] == df[df.columns[4]]).astype(int)
-    df['match_nivel_ingles'] = (df[df.columns[2]] == df[df.columns[5]]).astype(int)
+    # 3. Fazer a predição usando a pipeline completa
+    # Agora o df tem todas as colunas que a pipeline espera
+    prediction = pipeline.predict(df)
+    prediction_proba = pipeline.predict_proba(df)
 
-    # 3. Aplicar o pré-processamento salvo
-    processed_data = preprocessor.transform(df)
-
-    # 4. Fazer a predição
-    prediction = model.predict(processed_data)
-    prediction_proba = model.predict_proba(processed_data)
-
-    # 5. Retornar o resultado
+    # 4. Retornar o resultado
     return {
         "prediction": int(prediction[0]),
         "probability_no_match": f"{prediction_proba[0][0]:.4f}",
         "probability_match": f"{prediction_proba[0][1]:.4f}"
     }
 
-# --- Endpoint raiz para verificar se a API está no ar ---
 @app.get("/")
 def read_root():
-    return {"status": "API de Match de Vagas está no ar!"}
+    return {"status": "API de Match de Vagas V2 está no ar!"}
