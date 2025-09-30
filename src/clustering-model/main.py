@@ -1,6 +1,6 @@
 # main.py (versão com a função predict CORRIGIDA)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -24,6 +24,19 @@ try:
 except FileNotFoundError:
     print(f"ERRO: Pipeline não encontrada no caminho: {PIPELINE_PATH}")
     pipeline = None
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health_check(response: Response):
+    """
+    Verifica se a API está no ar e se o modelo de ML foi carregado corretamente.
+    - Retorna 200 OK se o modelo estiver carregado.
+    - Retorna 503 Service Unavailable se o modelo falhou ao carregar.
+    """
+    if not pipeline:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "unhealthy", "detail": "Modelo de Machine Learning não foi carregado."}
+    
+    return {"status": "healthy", "detail": "API e modelo de ML estão operacionais."}
 
 
 # --- Definindo o formato de entrada dos dados (mais colunas) ---
