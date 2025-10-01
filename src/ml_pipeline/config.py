@@ -1,6 +1,6 @@
 # ml_pipeline/config.py
-RAW_DATA_DIR = "data/raw/"
-PROCESSED_DATA_DIR = "data/processed/"
+RAW_DATA_DIR = "Data/raw/"
+PROCESSED_DATA_DIR = "Data/processed/"
 MODELS_DIR = "models/"
 UNIFIED_DATA_PATH = PROCESSED_DATA_DIR + "dados_unificados.parquet"
 MODEL_PATH = MODELS_DIR + "pipeline_model_v2.joblib.gz"
