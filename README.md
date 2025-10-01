@@ -21,38 +21,157 @@ O modelo final escolhido foi um **RandomForestClassifier (V2)**, que demonstrou 
 ## 2. Instruções de Deploy
 
 ### Pré-requisitos
-* Docker Desktop instalado e em execução.
+Docker Desktop: Instale e execute o Docker Desktop, que inclui o Docker Engine e o Docker Compose.
 
-### Passos para Executar
-1.  **Clone o Repositório:**
-    ```bash
-    git clone [URL_DO_SEU_REPOSITORIO]
-    cd [NOME_DO_SEU_REPOSITORIO]
-    ```
+Passos para Executar
+O projeto utiliza o Docker Compose para orquestrar todos os serviços de forma simples, garantindo que a API e qualquer outro serviço necessário subam com um único comando.
 
-2.  **Construa a Imagem Docker:**
-    O `Dockerfile` na raiz do projeto contém todas as instruções necessárias.
-    ```bash
-    docker build -t match-api:v2 .
-    ```
+Clone o Repositório:
 
-3.  **Execute o Contêiner:**
-    Este comando irá iniciar a API na porta 8000.
-    ```bash
-    docker run -p 8000:8000 match-api:v2
-    ```
+```bash
+git clone [URL_DO_SEU_REPOSITORIO]
+cd [NOME_DO_SEU_REPOSITORIO]
+```
 
-4.  **Acesse a API:**
-    * **Status:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-    * **Documentação Interativa (Swagger):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+Construa e Suba os Contêineres:
+Com o docker-compose.yml na raiz do projeto, este comando irá construir a imagem da API e iniciar o serviço na porta 8000.
+
+
+```bash
+docker compose up --build
+```
+
+## 3. Estrutura de Pastas e Arquivos
+
+```
+├── docker-compose.yml         # Orquestração dos serviços Docker
+├── Dockerfile                 # Imagem da API FastAPI
+├── prometheus.yml             # Configuração do Prometheus para métricas
+├── pyproject.toml             # Configuração do projeto Python
+├── requirements.txt           # Dependências principais do projeto
+├── requirements_test.txt      # Dependências para testes
+├── README.md                  # Documentação do projeto
+├── drawings/                  # Diagramas e desenhos da solução
+│   ├── desenho_solucao.png    # Imagem do desenho da solução
+│   └── fiap.excalidraw        # Arquivo editável do diagrama
+├── htmlcov/                   # Relatórios de cobertura de testes
+│   └── ...                    # Arquivos gerados pelo pytest-cov
+├── src/                       # Código-fonte principal
+│   ├── main.py                # Ponto de entrada da API FastAPI
+│   ├── dashboard.py           # Dashboard de visualização (se aplicável)
+│   ├── predictions.log        # Log das previsões realizadas
+│   ├── Data/                  # Dados utilizados no pipeline
+│   │   ├── processed/         # Dados processados (parquet, csv)
+│   │   └── raw/               # Dados brutos (json, zip)
+│   ├── helpers/               # Utilitários e middlewares
+│   │   └── middleware.py      # Middleware para métricas Prometheus
+│   ├── ml_pipeline/           # Pipeline de Machine Learning
+│   │   ├── config.py          # Configurações do pipeline
+│   │   ├── data_processing.py # Pré-processamento dos dados
+│   │   ├── evaluate.py        # Avaliação do modelo
+│   │   ├── feature_engineering.py # Engenharia de features
+│   │   └── train.py           # Treinamento do modelo
+│   ├── models/                # Modelos treinados
+│   │   └── pipeline_model_v2.joblib.gz # Modelo final
+│   ├── routers/               # Rotas da API
+│   │   ├── prediction.py      # Rota de predição
+│   │   └── prometheus.py      # Rota de métricas
+│   ├── schemas/               # Schemas de dados (Pydantic)
+│   │   └── candidate.py       # Schema do candidato
+│   ├── services/              # Serviços de negócio
+│   │   └── ml_services.py     # Serviço de predição ML
+│   └── __pycache__/           # Arquivos de cache Python
+├── tests/                     # Testes automatizados
+│   ├── test_endpoints.py      # Testes das rotas da API
+│   ├── test_middleware.py     # Testes do middleware
+│   └── test_ml_service.py     # Testes do serviço ML
+│   └── __init__.py            # Inicialização dos testes
+│   └── __pycache__/           # Cache dos testes
+```
+
+### Descrição das principais pastas e arquivos
+
+- **docker-compose.yml / Dockerfile**: Configuração para containerização e deploy.
+- **src/**: Todo o código-fonte da API, pipeline ML, middlewares, rotas e serviços.
+- **main.py**: Ponto de entrada da API FastAPI.
+- **Data/**: Dados brutos e processados usados no pipeline.
+- **helpers/**: Middlewares e utilitários.
+- **ml_pipeline/**: Scripts de processamento, engenharia de features, avaliação e treinamento do modelo.
+- **models/**: Modelos treinados salvos.
+- **routers/**: Rotas da API (predição, métricas).
+- **schemas/**: Schemas de dados para validação.
+- **services/**: Lógica de negócio e integração do modelo ML.
+- **tests/**: Testes automatizados para garantir qualidade do código.
+- **drawings/**: Diagramas e documentação visual.
+- **htmlcov/**: Relatórios de cobertura de testes.
+```
+
+A flag --build garante que a imagem seja reconstruída com as últimas alterações do seu código antes de iniciar o contêiner.
+
+Acesse a API:
+
+Status: http://127.0.0.1:8000/
+
+Documentação Interativa (Swagger): http://127.0.0.1:8000/docs
+
+Comandos Úteis do Docker Compose
+Rodar em segundo plano: Para deixar o terminal livre, use a flag -d (detach).
+
+```bash
+docker compose up -d
+```
+Parar e Remover Contêineres: Para encerrar os serviços e limpar os contêineres e redes, use este comando.
+
+```bash
+docker compose down
+Visualizar Logs: Para inspecionar a saída de todos os contêineres, use o comando de logs.
+```
+
+```bash
+docker compose logs
+```
+
+### Visualizar Métricas com Streamlit
+
+Para verificar as métricas do projeto de forma interativa, utilize o dashboard com Streamlit:
+
+1. Instale o Streamlit (se necessário):
+  ```bash
+  pip install streamlit
+  ```
+2. Execute o dashboard:
+  ```bash
+  streamlit run src/dashboard.py
+  ```
+3. Acesse o navegador em [http://localhost:8501](http://localhost:8501) para visualizar as métricas e gráficos.
 
 ## 3. Exemplos de Chamadas à API
 
-Você pode usar a documentação interativa ou a ferramenta `cURL` para testar o endpoint `/predict`.
+### 1. Health Check (/health)
+Este endpoint verifica o status da API e se o modelo de machine learning foi carregado corretamente.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/health'
+```
+
+Retorno esperado: Se tudo estiver funcionando, você receberá um status 200 OK e um JSON com a mensagem de que a API e o modelo estão operacionais.
+
+### 2. Status da API (/)
+Este é o endpoint raiz, que confirma que a sua API está no ar.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/'
+```
+Retorno esperado: Um JSON com a mensagem de status da API.
+
+### 3. Predição de Match (/predict)
+Este é o endpoint principal que recebe os dados de um candidato e de uma vaga e retorna a predição de compatibilidade do modelo. Você deve enviar um corpo JSON com as informações necessárias.
 
 ```bash
 curl -X 'POST' \
-  '[http://127.0.0.1:8000/predict](http://127.0.0.1:8000/predict)' \
+  'http://127.0.0.1:8000/predict' \
   -H 'Content-Type: application/json' \
   -d '{
   "nivel_profissional_candidato": "sênior",
@@ -66,6 +185,16 @@ curl -X 'POST' \
   "tipo_contratacao_vaga": "clt full"
 }'
 ```
+Retorno esperado: Um JSON com a predição do modelo.
+
+### 4. Métricas do Prometheus (/metrics)
+Este endpoint, usado para monitoramento, expõe as métricas de latência, número de requisições e taxa de erro da sua aplicação.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/metrics'
+```
+Retorno esperado: Um texto simples com as métricas da sua API no formato do Prometheus
 
 ## 4. Pipeline de Machine Learning
 
@@ -75,3 +204,54 @@ A construção do modelo seguiu as seguintes etapas:
 3.  **Engenharia de Features:** Foram criadas features manuais para comparar diretamente o perfil do candidato e da vaga (ex: `match_nivel_profissional`).
 4.  **Pré-processamento:** As features categóricas foram tratadas com `OneHotEncoder` para conversão em formato numérico.
 5.  **Seleção de Modelo:** O modelo `RandomForestClassifier` foi escolhido e otimizado com o parâmetro `class_weight='balanced'` para melhorar a identificação da classe minoritária (matches), resultando em um **aumento de recall de 15% para 49%**.
+
+
+## 5. Deploy na AWS
+
+O deploy da solução na AWS foi realizado em uma conta free tier, seguindo uma arquitetura de orquestração de contêineres com AWS ECS (Elastic Container Service). O processo envolve o empacotamento do código em uma imagem Docker, o envio para um repositório na nuvem e a criação de serviços AWS para gerenciar a aplicação.
+
+### 5.1. Repositório ECR
+O Amazon Elastic Container Registry (ECR) foi utilizado como o repositório privado para armazenar a imagem Docker da API. Os seguintes comandos foram executados via AWS CLI para autenticar o Docker e fazer o push da imagem.
+
+Autenticar o Docker no ECR:
+
+```bash
+aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin [account-number].dkr.ecr.sa-east-1.amazonaws.com
+```
+Observação: A versão mais recente da AWS CLI é necessária para que o comando funcione corretamente.
+
+
+Construir a Imagem Docker:
+
+```bash
+docker build -t datathon .
+```
+Adicionar a Tag do Repositório ECR na Imagem:
+
+```bash
+docker tag datathon:latest 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+```
+
+Fazer o Push da Imagem para o ECR:
+
+```bash
+docker push 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+```
+
+### 5.2. Configuração no ECS
+Após a imagem ser enviada para o ECR, a orquestração foi configurada no ECS.
+
+Criação do Cluster ECS: Um cluster ECS foi criado para agrupar as instâncias onde a aplicação seria executada.
+
+Definição da Task Definition: Uma Definição de Tarefa foi criada para servir como um "blueprint" para o contêiner. Ela foi configurada para fazer o pull da imagem a partir do repositório ECR.
+
+Criação do Serviço ECS: Um Serviço foi criado para garantir que a aplicação estivesse sempre em execução. Este Serviço foi configurado para usar a Definição de Tarefa e para manter um número mínimo de tarefas rodando.
+
+### 5.3. Balanceador de Carga (ALB)
+Um Application Load Balancer (ALB) foi configurado para gerenciar o tráfego de entrada e direcioná-lo para a API.
+
+Target Group: Um Target Group foi criado, apontando para a porta 8000, que é a porta em que a API é executada dentro do contêiner.
+
+Listener: Um Listener foi configurado na porta 8000 do ALB para receber o tráfego da internet e direcioná-lo para o Target Group.
+
+Dessa forma, a aplicação foi disponibilizada na AWS, acessível através da URL do Application Load Balancer.

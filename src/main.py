@@ -8,7 +8,6 @@ app = FastAPI(
     version="2.0"
 )
 
-# Adiciona o middleware para instrumentar as rotas
 app.add_middleware(PrometheusMiddleware)
 
 app.include_router(prediction.router)

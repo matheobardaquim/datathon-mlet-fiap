@@ -1,10 +1,7 @@
-# app/routers/prediction.py
-
 from fastapi import APIRouter, Response, status
 from src.schemas.candidate import CandidateData
 from src.services.ml_services import ml_service
 
-# Cria um "roteador" que agrupará todos os endpoints relacionados
 router = APIRouter()
 
 @router.get("/", tags=["General"])
