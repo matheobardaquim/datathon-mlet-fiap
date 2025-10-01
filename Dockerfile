@@ -13,8 +13,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copia o modelo comprimido para a raiz do WORKDIR (/app)
-COPY Data/pipeline_model_v2.joblib.gz .
+# Copia o modelo comprimido para a raiz do WORKDIR
+COPY src/models/pipeline_model_v2.joblib.gz .
 
 # Copia toda a nova pasta 'src' para dentro do WORKDIR
 COPY src/ ./src
