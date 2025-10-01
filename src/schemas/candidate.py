@@ -1,5 +1,3 @@
-# app/schemas/candidate.py
-
 from pydantic import BaseModel, ConfigDict
 
 class CandidateData(BaseModel):

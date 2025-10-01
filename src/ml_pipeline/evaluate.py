@@ -1,4 +1,3 @@
-# ml_pipeline/evaluate.py
 from sklearn.metrics import classification_report, confusion_matrix
 
 def print_evaluation_metrics(y_true, y_pred, model_name="Modelo"):

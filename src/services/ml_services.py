@@ -1,5 +1,3 @@
-# app/services/ml_service.py (COM CAMINHO DO LOG CORRIGIDO)
-
 import joblib
 import pandas as pd
 from datetime import datetime, timezone
@@ -8,17 +6,16 @@ import logging
 import json
 from src.schemas.candidate import CandidateData
 
-# --- CORREÇÃO: Configuração do Logger Simplificada e Robusta ---+
 project_root = pathlib.Path(__file__).parent.parent
 log_path = project_root / "predictions.log"
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(message)s',
-    filename=str(log_path), # Define o arquivo de log diretamente
-    force=True             # Força a reconfiguração (bom para ambientes de reload)
+    filename=str(log_path), 
+    force=True             
 )
-# Adiciona um handler para também mostrar o log no terminal
+
 logging.getLogger().addHandler(logging.StreamHandler())
 logger = logging.getLogger(__name__)
 
@@ -28,10 +25,6 @@ class MLService:
 
     def _load_pipeline(self):
         try:
-            # --- CORREÇÃO APLICADA AQUI ---
-            # 1. Pega o caminho do arquivo atual (__file__)
-            # 2. Navega três níveis para cima (de services -> src -> app) para chegar na raiz (/app)
-            # 3. Entra na pasta 'models' e seleciona o arquivo
             project_root_model = pathlib.Path(__file__).parent.parent
             pipeline_path = project_root_model / "models" / "pipeline_model_v2.joblib.gz"
             
@@ -42,7 +35,6 @@ class MLService:
             print(f"ERRO: Pipeline não encontrada no caminho: {pipeline_path}")
             return None
 
-    # ... o resto do seu arquivo (is_ready, predict) continua exatamente igual ...
     def is_ready(self):
         return self.pipeline is not None
 

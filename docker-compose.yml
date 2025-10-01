@@ -5,8 +5,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Mapeia a pasta atual ('.') do seu PC para a pasta '/app' no contêiner.
-      # Isso significa que o 'predictions.log' criado em /app aparecerá na sua pasta.
       - .:/app
     env_file:
       - .env

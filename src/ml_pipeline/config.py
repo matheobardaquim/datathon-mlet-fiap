@@ -1,4 +1,3 @@
-# ml_pipeline/config.py
 RAW_DATA_DIR = "Data/raw/"
 PROCESSED_DATA_DIR = "Data/processed/"
 MODELS_DIR = "models/"

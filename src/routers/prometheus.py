@@ -1,4 +1,3 @@
-# ...existing code...
 from fastapi import APIRouter, Response
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 

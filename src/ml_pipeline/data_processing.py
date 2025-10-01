@@ -1,5 +1,3 @@
-# ml_pipeline/data_processing.py
-
 import pandas as pd
 import json
 import os
@@ -52,7 +50,6 @@ def create_unified_dataset():
     unzip_raw_data_if_needed()
     print("Iniciando pré-processamento dos dados brutos (JSONs)...")
 
-    # Adicionando prints para rastrear cada passo
     print("Carregando vagas.json...")
     df_jobs = _load_keyed_json(os.path.join(config.RAW_DATA_DIR, 'vagas.json'), 'vaga_id')
     print("Carregando applicants.json...")

@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock, patch
 
 @pytest.mark.asyncio
 async def test_dispatch_metrics_path():
-    # Mock request for /metrics
     request = Request({
         "type": "http",
         "method": "GET",
@@ -31,7 +30,6 @@ async def test_dispatch_metrics_path():
 
 @pytest.mark.asyncio
 async def test_dispatch_normal_path(monkeypatch):
-    # Mock request for normal path
     request = Request({
         "type": "http",
         "method": "GET",
@@ -49,7 +47,6 @@ async def test_dispatch_normal_path(monkeypatch):
     call_next = AsyncMock(return_value=Response("ok", status_code=201))
     middleware = PrometheusMiddleware(call_next)
 
-    # Patch prometheus metrics to avoid side effects
     with patch("src.helpers.middleware.IN_PROGRESS_REQUESTS"), \
          patch("src.helpers.middleware.REQUESTS_TOTAL"), \
          patch("src.helpers.middleware.REQUEST_LATENCY"), \
@@ -60,7 +57,6 @@ async def test_dispatch_normal_path(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_dispatch_exception(monkeypatch):
-    # Mock request for normal path
     request = Request({
         "type": "http",
         "method": "POST",
@@ -85,5 +81,4 @@ async def test_dispatch_exception(monkeypatch):
          patch("src.helpers.middleware.REQUEST_ERRORS") as mock_errors:
         with pytest.raises(ValueError):
             await middleware.dispatch(request, failing_call_next)
-        # Verifica se o contador de erros foi chamado
         assert mock_errors.labels.called

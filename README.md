@@ -19,7 +19,8 @@ O modelo final escolhido foi um **RandomForestClassifier (V2)**, que demonstrou 
 * **Testes:** Pytest, Pytest-Cov
 
 ## 2. Instruções de Deploy
-Pré-requisitos
+
+### Pré-requisitos
 Docker Desktop: Instale e execute o Docker Desktop, que inclui o Docker Engine e o Docker Compose.
 
 Passos para Executar

@@ -1,8 +1,6 @@
-# tests/test_endpoints.py (CORRIGIDO)
-
 from fastapi.testclient import TestClient
 from src.main import app
-from src.routers import prediction  # Importa o módulo de predição diretamente
+from src.routers import prediction  
 
 client = TestClient(app)
 
@@ -12,7 +10,6 @@ def test_read_root():
     assert response.json() == {"status": "API de Match de Vagas V2 está no ar!"}
 
 def test_health_check_when_healthy(mocker):
-    # Agora fazemos o patch diretamente no objeto importado
     mocker.patch.object(prediction.ml_service, 'is_ready', return_value=True)
     
     response = client.get("/health")

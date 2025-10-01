@@ -1,5 +1,3 @@
-# dashboard.py (VERSÃO FINAL COM CORREÇÃO DE TIMEZONE)
-
 import streamlit as st
 import pandas as pd
 import json
@@ -43,7 +41,6 @@ prod_data = load_data()
 if prod_data is not None:
     st.header("Análise de Tendência e Drift de Previsão")
 
-    # --- Filtro de Data na Barra Lateral ---
     st.sidebar.header("Filtros")
     min_date = prod_data['timestamp'].min().date()
     max_date = prod_data['timestamp'].max().date()
@@ -56,12 +53,9 @@ if prod_data is not None:
     )
 
     if len(date_range) == 2:
-        # --- CORREÇÃO APLICADA AQUI ---
-        # Converte as datas do filtro e as TORNA CONSCIENTES do fuso horário UTC
         start_date = pd.to_datetime(date_range[0]).tz_localize('UTC')
         end_date = pd.to_datetime(date_range[1]).replace(hour=23, minute=59).tz_localize('UTC')
 
-        # Agora a comparação entre datas com o mesmo fuso horário funciona
         filtered_data = prod_data[
             (prod_data['timestamp'] >= start_date) & (prod_data['timestamp'] <= end_date)
         ]
@@ -69,7 +63,6 @@ if prod_data is not None:
         if filtered_data.empty:
             st.warning("Nenhum dado encontrado para o período selecionado.")
         else:
-            # --- Gráfico de Tendência ---
             st.subheader("Tendência da Probabilidade Média de 'Match' por Dia")
             daily_avg_prob = filtered_data.set_index('timestamp')['probability_match'].resample('D').mean().dropna()
             st.line_chart(daily_avg_prob)
@@ -78,7 +71,6 @@ if prod_data is not None:
             isso pode ser um forte indicador de drift.
             """)
 
-            # --- Comparação de Distribuição ---
             st.subheader("Comparação da Distribuição de Probabilidades no Período")
             half_point = len(filtered_data) // 2
             first_half = filtered_data.iloc[:half_point]

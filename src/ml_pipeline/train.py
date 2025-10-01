@@ -1,4 +1,3 @@
-# ml_pipeline/train.py
 import pandas as pd
 import joblib
 import os
