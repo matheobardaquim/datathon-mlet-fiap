@@ -131,6 +131,20 @@ Visualizar Logs: Para inspecionar a saída de todos os contêineres, use o coman
 docker compose logs
 ```
 
+### Visualizar Métricas com Streamlit
+
+Para verificar as métricas do projeto de forma interativa, utilize o dashboard com Streamlit:
+
+1. Instale o Streamlit (se necessário):
+  ```bash
+  pip install streamlit
+  ```
+2. Execute o dashboard:
+  ```bash
+  streamlit run src/dashboard.py
+  ```
+3. Acesse o navegador em [http://localhost:8501](http://localhost:8501) para visualizar as métricas e gráficos.
+
 ## 3. Exemplos de Chamadas à API
 
 ### 1. Health Check (/health)
