@@ -30,7 +30,8 @@ def run_training():
     y = df_featured['target']
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    
+    X_test.to_csv("data/processed/reference_data.csv", index=False)
+
     preprocessor = ColumnTransformer(
         transformers=[('cat', OneHotEncoder(handle_unknown='ignore', drop='first'), config.CATEGORICAL_FEATURES)],
         remainder='passthrough'
