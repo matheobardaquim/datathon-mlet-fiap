@@ -67,11 +67,31 @@ docker compose logs
 
 ## 3. Exemplos de Chamadas à API
 
-Você pode usar a documentação interativa ou a ferramenta `cURL` para testar o endpoint `/predict`.
+### 1. Health Check (/health)
+Este endpoint verifica o status da API e se o modelo de machine learning foi carregado corretamente.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/health'
+```
+
+Retorno esperado: Se tudo estiver funcionando, você receberá um status 200 OK e um JSON com a mensagem de que a API e o modelo estão operacionais.
+
+### 2. Status da API (/)
+Este é o endpoint raiz, que confirma que a sua API está no ar.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/'
+```
+Retorno esperado: Um JSON com a mensagem de status da API.
+
+### 3. Predição de Match (/predict)
+Este é o endpoint principal que recebe os dados de um candidato e de uma vaga e retorna a predição de compatibilidade do modelo. Você deve enviar um corpo JSON com as informações necessárias.
 
 ```bash
 curl -X 'POST' \
-  '[http://127.0.0.1:8000/predict](http://127.0.0.1:8000/predict)' \
+  'http://127.0.0.1:8000/predict' \
   -H 'Content-Type: application/json' \
   -d '{
   "nivel_profissional_candidato": "sênior",
@@ -85,6 +105,16 @@ curl -X 'POST' \
   "tipo_contratacao_vaga": "clt full"
 }'
 ```
+Retorno esperado: Um JSON com a predição do modelo.
+
+### 4. Métricas do Prometheus (/metrics)
+Este endpoint, usado para monitoramento, expõe as métricas de latência, número de requisições e taxa de erro da sua aplicação.
+
+```bash
+curl -X 'GET' \
+  'http://127.0.0.1:8000/metrics'
+```
+Retorno esperado: Um texto simples com as métricas da sua API no formato do Prometheus
 
 ## 4. Pipeline de Machine Learning
 
@@ -100,7 +130,7 @@ A construção do modelo seguiu as seguintes etapas:
 
 O deploy da solução na AWS foi realizado em uma conta free tier, seguindo uma arquitetura de orquestração de contêineres com AWS ECS (Elastic Container Service). O processo envolve o empacotamento do código em uma imagem Docker, o envio para um repositório na nuvem e a criação de serviços AWS para gerenciar a aplicação.
 
-5.1. Repositório ECR
+### 5.1. Repositório ECR
 O Amazon Elastic Container Registry (ECR) foi utilizado como o repositório privado para armazenar a imagem Docker da API. Os seguintes comandos foram executados via AWS CLI para autenticar o Docker e fazer o push da imagem.
 
 Autenticar o Docker no ECR:
@@ -128,7 +158,7 @@ Fazer o Push da Imagem para o ECR:
 docker push 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
 ```
 
-5.2. Configuração no ECS
+### 5.2. Configuração no ECS
 Após a imagem ser enviada para o ECR, a orquestração foi configurada no ECS.
 
 Criação do Cluster ECS: Um cluster ECS foi criado para agrupar as instâncias onde a aplicação seria executada.
@@ -137,7 +167,7 @@ Definição da Task Definition: Uma Definição de Tarefa foi criada para servir
 
 Criação do Serviço ECS: Um Serviço foi criado para garantir que a aplicação estivesse sempre em execução. Este Serviço foi configurado para usar a Definição de Tarefa e para manter um número mínimo de tarefas rodando.
 
-5.3. Balanceador de Carga (ALB)
+### 5.3. Balanceador de Carga (ALB)
 Um Application Load Balancer (ALB) foi configurado para gerenciar o tráfego de entrada e direcioná-lo para a API.
 
 Target Group: Um Target Group foi criado, apontando para a porta 8000, que é a porta em que a API é executada dentro do contêiner.
