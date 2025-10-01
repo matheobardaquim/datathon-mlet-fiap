@@ -27,16 +27,19 @@ O projeto utiliza o Docker Compose para orquestrar todos os serviços de forma s
 
 Clone o Repositório:
 
-Bash
-
+```bash
 git clone [URL_DO_SEU_REPOSITORIO]
 cd [NOME_DO_SEU_REPOSITORIO]
+```
+
 Construa e Suba os Contêineres:
 Com o docker-compose.yml na raiz do projeto, este comando irá construir a imagem da API e iniciar o serviço na porta 8000.
 
-Bash
 
+```bash
 docker compose up --build
+```
+
 A flag --build garante que a imagem seja reconstruída com as últimas alterações do seu código antes de iniciar o contêiner.
 
 Acesse a API:
@@ -48,19 +51,19 @@ Documentação Interativa (Swagger): http://127.0.0.1:8000/docs
 Comandos Úteis do Docker Compose
 Rodar em segundo plano: Para deixar o terminal livre, use a flag -d (detach).
 
-Bash
-
+```bash
 docker compose up -d
+```
 Parar e Remover Contêineres: Para encerrar os serviços e limpar os contêineres e redes, use este comando.
 
-Bash
-
+```bash
 docker compose down
 Visualizar Logs: Para inspecionar a saída de todos os contêineres, use o comando de logs.
+```
 
-Bash
-
+```bash
 docker compose logs
+```
 
 ## 3. Exemplos de Chamadas à API
 
@@ -102,26 +105,29 @@ O Amazon Elastic Container Registry (ECR) foi utilizado como o repositório priv
 
 Autenticar o Docker no ECR:
 
-Bash
-
-aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 530997927415.dkr.ecr.sa-east-1.amazonaws.com
+```bash
+aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin [account-number].dkr.ecr.sa-east-1.amazonaws.com
+```
 Observação: A versão mais recente da AWS CLI é necessária para que o comando funcione corretamente.
+
 
 Construir a Imagem Docker:
 
-Bash
-
+```bash
 docker build -t datathon .
+```
 Adicionar a Tag do Repositório ECR na Imagem:
 
-Bash
-
+```bash
 docker tag datathon:latest 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+```
+
 Fazer o Push da Imagem para o ECR:
 
-Bash
-
+```bash
 docker push 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+```
+
 5.2. Configuração no ECS
 Após a imagem ser enviada para o ECR, a orquestração foi configurada no ECS.
 
