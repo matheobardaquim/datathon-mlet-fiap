@@ -19,32 +19,48 @@ O modelo final escolhido foi um **RandomForestClassifier (V2)**, que demonstrou 
 * **Testes:** Pytest, Pytest-Cov
 
 ## 2. Instruções de Deploy
+Pré-requisitos
+Docker Desktop: Instale e execute o Docker Desktop, que inclui o Docker Engine e o Docker Compose.
 
-### Pré-requisitos
-* Docker Desktop instalado e em execução.
+Passos para Executar
+O projeto utiliza o Docker Compose para orquestrar todos os serviços de forma simples, garantindo que a API e qualquer outro serviço necessário subam com um único comando.
 
-### Passos para Executar
-1.  **Clone o Repositório:**
-    ```bash
-    git clone [URL_DO_SEU_REPOSITORIO]
-    cd [NOME_DO_SEU_REPOSITORIO]
-    ```
+Clone o Repositório:
 
-2.  **Construa a Imagem Docker:**
-    O `Dockerfile` na raiz do projeto contém todas as instruções necessárias.
-    ```bash
-    docker build -t match-api:v2 .
-    ```
+Bash
 
-3.  **Execute o Contêiner:**
-    Este comando irá iniciar a API na porta 8000.
-    ```bash
-    docker run -p 8000:8000 match-api:v2
-    ```
+git clone [URL_DO_SEU_REPOSITORIO]
+cd [NOME_DO_SEU_REPOSITORIO]
+Construa e Suba os Contêineres:
+Com o docker-compose.yml na raiz do projeto, este comando irá construir a imagem da API e iniciar o serviço na porta 8000.
 
-4.  **Acesse a API:**
-    * **Status:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-    * **Documentação Interativa (Swagger):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+Bash
+
+docker compose up --build
+A flag --build garante que a imagem seja reconstruída com as últimas alterações do seu código antes de iniciar o contêiner.
+
+Acesse a API:
+
+Status: http://127.0.0.1:8000/
+
+Documentação Interativa (Swagger): http://127.0.0.1:8000/docs
+
+Comandos Úteis do Docker Compose
+Rodar em segundo plano: Para deixar o terminal livre, use a flag -d (detach).
+
+Bash
+
+docker compose up -d
+Parar e Remover Contêineres: Para encerrar os serviços e limpar os contêineres e redes, use este comando.
+
+Bash
+
+docker compose down
+Visualizar Logs: Para inspecionar a saída de todos os contêineres, use o comando de logs.
+
+Bash
+
+docker compose logs
 
 ## 3. Exemplos de Chamadas à API
 
@@ -75,3 +91,51 @@ A construção do modelo seguiu as seguintes etapas:
 3.  **Engenharia de Features:** Foram criadas features manuais para comparar diretamente o perfil do candidato e da vaga (ex: `match_nivel_profissional`).
 4.  **Pré-processamento:** As features categóricas foram tratadas com `OneHotEncoder` para conversão em formato numérico.
 5.  **Seleção de Modelo:** O modelo `RandomForestClassifier` foi escolhido e otimizado com o parâmetro `class_weight='balanced'` para melhorar a identificação da classe minoritária (matches), resultando em um **aumento de recall de 15% para 49%**.
+
+
+## 5. Deploy na AWS
+
+O deploy da solução na AWS foi realizado em uma conta free tier, seguindo uma arquitetura de orquestração de contêineres com AWS ECS (Elastic Container Service). O processo envolve o empacotamento do código em uma imagem Docker, o envio para um repositório na nuvem e a criação de serviços AWS para gerenciar a aplicação.
+
+5.1. Repositório ECR
+O Amazon Elastic Container Registry (ECR) foi utilizado como o repositório privado para armazenar a imagem Docker da API. Os seguintes comandos foram executados via AWS CLI para autenticar o Docker e fazer o push da imagem.
+
+Autenticar o Docker no ECR:
+
+Bash
+
+aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 530997927415.dkr.ecr.sa-east-1.amazonaws.com
+Observação: A versão mais recente da AWS CLI é necessária para que o comando funcione corretamente.
+
+Construir a Imagem Docker:
+
+Bash
+
+docker build -t datathon .
+Adicionar a Tag do Repositório ECR na Imagem:
+
+Bash
+
+docker tag datathon:latest 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+Fazer o Push da Imagem para o ECR:
+
+Bash
+
+docker push 530997927415.dkr.ecr.sa-east-1.amazonaws.com/datathon:latest
+5.2. Configuração no ECS
+Após a imagem ser enviada para o ECR, a orquestração foi configurada no ECS.
+
+Criação do Cluster ECS: Um cluster ECS foi criado para agrupar as instâncias onde a aplicação seria executada.
+
+Definição da Task Definition: Uma Definição de Tarefa foi criada para servir como um "blueprint" para o contêiner. Ela foi configurada para fazer o pull da imagem a partir do repositório ECR.
+
+Criação do Serviço ECS: Um Serviço foi criado para garantir que a aplicação estivesse sempre em execução. Este Serviço foi configurado para usar a Definição de Tarefa e para manter um número mínimo de tarefas rodando.
+
+5.3. Balanceador de Carga (ALB)
+Um Application Load Balancer (ALB) foi configurado para gerenciar o tráfego de entrada e direcioná-lo para a API.
+
+Target Group: Um Target Group foi criado, apontando para a porta 8000, que é a porta em que a API é executada dentro do contêiner.
+
+Listener: Um Listener foi configurado na porta 8000 do ALB para receber o tráfego da internet e direcioná-lo para o Target Group.
+
+Dessa forma, a aplicação foi disponibilizada na AWS, acessível através da URL do Application Load Balancer.
