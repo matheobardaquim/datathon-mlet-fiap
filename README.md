@@ -40,6 +40,71 @@ Com o docker-compose.yml na raiz do projeto, este comando irá construir a image
 docker compose up --build
 ```
 
+## 3. Estrutura de Pastas e Arquivos
+
+```
+├── docker-compose.yml         # Orquestração dos serviços Docker
+├── Dockerfile                 # Imagem da API FastAPI
+├── prometheus.yml             # Configuração do Prometheus para métricas
+├── pyproject.toml             # Configuração do projeto Python
+├── requirements.txt           # Dependências principais do projeto
+├── requirements_test.txt      # Dependências para testes
+├── README.md                  # Documentação do projeto
+├── drawings/                  # Diagramas e desenhos da solução
+│   ├── desenho_solucao.png    # Imagem do desenho da solução
+│   └── fiap.excalidraw        # Arquivo editável do diagrama
+├── htmlcov/                   # Relatórios de cobertura de testes
+│   └── ...                    # Arquivos gerados pelo pytest-cov
+├── src/                       # Código-fonte principal
+│   ├── main.py                # Ponto de entrada da API FastAPI
+│   ├── dashboard.py           # Dashboard de visualização (se aplicável)
+│   ├── predictions.log        # Log das previsões realizadas
+│   ├── Data/                  # Dados utilizados no pipeline
+│   │   ├── processed/         # Dados processados (parquet, csv)
+│   │   └── raw/               # Dados brutos (json, zip)
+│   ├── helpers/               # Utilitários e middlewares
+│   │   └── middleware.py      # Middleware para métricas Prometheus
+│   ├── ml_pipeline/           # Pipeline de Machine Learning
+│   │   ├── config.py          # Configurações do pipeline
+│   │   ├── data_processing.py # Pré-processamento dos dados
+│   │   ├── evaluate.py        # Avaliação do modelo
+│   │   ├── feature_engineering.py # Engenharia de features
+│   │   └── train.py           # Treinamento do modelo
+│   ├── models/                # Modelos treinados
+│   │   └── pipeline_model_v2.joblib.gz # Modelo final
+│   ├── routers/               # Rotas da API
+│   │   ├── prediction.py      # Rota de predição
+│   │   └── prometheus.py      # Rota de métricas
+│   ├── schemas/               # Schemas de dados (Pydantic)
+│   │   └── candidate.py       # Schema do candidato
+│   ├── services/              # Serviços de negócio
+│   │   └── ml_services.py     # Serviço de predição ML
+│   └── __pycache__/           # Arquivos de cache Python
+├── tests/                     # Testes automatizados
+│   ├── test_endpoints.py      # Testes das rotas da API
+│   ├── test_middleware.py     # Testes do middleware
+│   └── test_ml_service.py     # Testes do serviço ML
+│   └── __init__.py            # Inicialização dos testes
+│   └── __pycache__/           # Cache dos testes
+```
+
+### Descrição das principais pastas e arquivos
+
+- **docker-compose.yml / Dockerfile**: Configuração para containerização e deploy.
+- **src/**: Todo o código-fonte da API, pipeline ML, middlewares, rotas e serviços.
+- **main.py**: Ponto de entrada da API FastAPI.
+- **Data/**: Dados brutos e processados usados no pipeline.
+- **helpers/**: Middlewares e utilitários.
+- **ml_pipeline/**: Scripts de processamento, engenharia de features, avaliação e treinamento do modelo.
+- **models/**: Modelos treinados salvos.
+- **routers/**: Rotas da API (predição, métricas).
+- **schemas/**: Schemas de dados para validação.
+- **services/**: Lógica de negócio e integração do modelo ML.
+- **tests/**: Testes automatizados para garantir qualidade do código.
+- **drawings/**: Diagramas e documentação visual.
+- **htmlcov/**: Relatórios de cobertura de testes.
+```
+
 A flag --build garante que a imagem seja reconstruída com as últimas alterações do seu código antes de iniciar o contêiner.
 
 Acesse a API:
